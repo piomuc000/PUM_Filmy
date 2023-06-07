@@ -13,8 +13,9 @@ import androidx.navigation.NavController
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import pl.edu.pbs.pum_filmy.navigation.MovieScreens
-import pl.edu.pbs.pum_filmy.MovieRow
+import pl.edu.pbs.pum_filmy.widgets.MovieRow
 import pl.edu.pbs.pum_filmy.model.getMovies
+import pl.edu.pbs.pum_filmy.model.Movie
 
 @Composable
 fun HomeScreen(navController: NavController) {

@@ -1,22 +1,67 @@
 package pl.edu.pbs.pum_filmy.widgets
 
+import androidx.compose.material.Card
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.rememberImagePainter
+import coil.transform.CircleCropTransformation
+import pl.edu.pbs.pum_filmy.model.Movie
+import pl.edu.pbs.pum_filmy.model.getMovies
 
-@Preview
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MovieRow(movie: Movie = getMovies()[0], onItemClick: (String) -> Unit = {}) {
-    var expanded by remember {
-        mutableStateOf(false)
-    }
-    val density = LocalDensity.current
+    var expanded by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .padding(4.dp)
             .fillMaxWidth()
-            .clickable {
-                onItemClick(movie.id.toString())
-            } ,
-        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
-        elevation = 6.dp
+            .clickable { onItemClick(movie.id.toString()) },
+        elevation = 6.dp,
+        shape = MaterialTheme.shapes.medium
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -25,32 +70,33 @@ fun MovieRow(movie: Movie = getMovies()[0], onItemClick: (String) -> Unit = {}) 
             Surface(
                 modifier = Modifier
                     .padding(12.dp)
-                    .size(100.dp),
-                shape = RectangleShape,
+                    .size(100.dp)
+                    .clip(MaterialTheme.shapes.medium),
                 elevation = 4.dp
             ) {
-                val painter = rememberAsyncImagePainter(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(movie.images[0])
-                        .size(Size.ORIGINAL)
-                        .transformations(CircleCropTransformation())
-                        .crossfade(false)
-                        .build()
+                val painter = rememberImagePainter(
+                    data = movie.images[0],
+                    builder = {
+                        crossfade(true)
+                        transformations(CircleCropTransformation())
+                    }
                 )
-                Image(painter = painter, contentDescription = "Movie Poster")
+                Image(
+                    painter = painter,
+                    contentDescription = "Movie Poster",
+                    modifier = Modifier.size(100.dp)
+                )
             }
+
             Column(modifier = Modifier.padding(4.dp)) {
                 Text(text = movie.title, style = MaterialTheme.typography.h6)
                 Text(text = "Director: ${movie.director}", style = MaterialTheme.typography.caption)
-                Text(text = "Released:${movie.year}", style = MaterialTheme.typography.caption)
+                Text(text = "Released: ${movie.year}", style = MaterialTheme.typography.caption)
+
                 AnimatedVisibility(
                     visible = expanded,
-                    enter = slideInVertically {
-                        with(density) { -40.dp.roundToPx() }
-                    } + expandVertically(
-                        expandFrom = Alignment.CenterVertically
-                    ) + fadeIn(initialAlpha = 0.4f),
-                    exit = slideOutVertically() + shrinkVertically() + fadeOut()
+                    enter = slideInHorizontally(initialOffsetX = { -it }),
+                    exit = slideOutHorizontally(targetOffsetX = { -it })
                 ) {
                     Column {
                         Text(
@@ -61,7 +107,7 @@ fun MovieRow(movie: Movie = getMovies()[0], onItemClick: (String) -> Unit = {}) 
                                         fontSize = 13.sp
                                     )
                                 ) {
-                                    append("Plot:")
+                                    append("Plot: ")
                                 }
                                 withStyle(
                                     style = SpanStyle(
@@ -79,24 +125,29 @@ fun MovieRow(movie: Movie = getMovies()[0], onItemClick: (String) -> Unit = {}) 
                                         fontWeight = FontWeight.Normal
                                     )
                                 ) {
-                                    append("\n  Mobile kurs4")
+                                    append("\nMobile kurs4")
                                 }
                             },
                             modifier = Modifier.padding(6.dp)
-                        ) // koniec Text
+                        )
                         Divider(modifier = Modifier.padding(3.dp))
-                        Text(text = "Director:${movie.director}", style = MaterialTheme.typography.caption)
-                        Text(text = "Actors:${movie.actors}", style = MaterialTheme.typography.caption)
-                    } // koniec column
+                        Text(
+                            text = "Director: ${movie.director}",
+                            style = MaterialTheme.typography.caption
+                        )
+                        Text(
+                            text = "Actors: ${movie.actors}",
+                            style = MaterialTheme.typography.caption
+                        )
+                    }
                 }
+
                 Icon(
-                    imageVector = if(expanded)Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                    contentDescription = "Down Arrow",
-                    Modifier
+                    imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    contentDescription = "Expand",
+                    modifier = Modifier
                         .size(25.dp)
-                        .clickable {
-                            expanded = !expanded
-                        },
+                        .clickable { expanded = !expanded },
                     tint = Color.LightGray
                 )
             }
