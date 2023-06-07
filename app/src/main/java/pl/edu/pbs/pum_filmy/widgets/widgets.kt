@@ -38,6 +38,7 @@ import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import pl.edu.pbs.pum_filmy.model.Movie
 import pl.edu.pbs.pum_filmy.model.getMovies
+import androidx.compose.runtime.setValue
 
 @Composable
 fun MovieRow(movie: Movie = getMovies()[0], onItemClick: (String) -> Unit = {}) {
