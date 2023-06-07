@@ -1,5 +1,6 @@
 package pl.edu.pbs.pum_filmy.screens.detals
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -16,11 +17,9 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
@@ -35,10 +34,7 @@ fun DetailsScreen(navController: NavController, movieId: Int?) {
     Scaffold(
         topBar = {
             TopAppBar(
-                backgroundColor = Color.Transparent,
-                elevation = 5.dp
-            ) {
-                Column(modifier = Modifier.padding(start = 8.dp)) {
+                navigationIcon = {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Arrow Back",
@@ -48,16 +44,18 @@ fun DetailsScreen(navController: NavController, movieId: Int?) {
                                 navController.popBackStack()
                             }
                     )
-                    Text(text = "Movies")
-                }
-            }
+                },
+                title = { Text(text = "Movies") },
+                backgroundColor = androidx.compose.ui.graphics.Color.Transparent,
+                elevation = 5.dp
+            )
         }
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .padding(horizontal = 16.dp)
+                .padding(it)
         ) {
             MovieRow(movie = newmovieList.first())
             Divider(modifier = Modifier.padding(vertical = 8.dp))
@@ -71,7 +69,7 @@ fun DetailsScreen(navController: NavController, movieId: Int?) {
 private fun HorizontalScrollableImageView(newmovieList: List<Movie>) {
     LazyRow(modifier = Modifier.height(240.dp)) {
         items(newmovieList[0].images) { image ->
-            val painter = rememberImagePainter(image)
+            val painter: Painter = rememberImagePainter(image)
             Image(
                 painter = painter,
                 contentDescription = "Movie Poster",
